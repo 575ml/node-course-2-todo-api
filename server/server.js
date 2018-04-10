@@ -3,7 +3,8 @@ var	express    = require('express'),
 	{mongoose} = require('./db/mongoose'),
 	{Todo}     = require('./models/todo'),
 	{User}     = require('./models/user'),
-	app 	   = express();
+	app 	   = express(),
+	{ObjectID} = require('mongodb');
 
 const port = process.env.PORT || 5000;
 
@@ -31,9 +32,35 @@ app.get('/todos', (req, res) => {
 	});
 });
 
+//GET a todo
+app.get('/todos/:id', (req, res) => {
+	var id = req.params.id;
+	// res.send(req.params);
+
+	//ID is invalid
+	if (!ObjectID.isValid(id)) {
+		return res.status(404).send();
+		console.log("Invalid ID");
+	}
+
+	Todo.findById(id).then((todo) => {
+		if(!todo){
+			console.log(err);
+			return res.status(404).send();
+		}
+			res.send({todo});
+
+	//ID is valid but can't find it
+	}).catch((e) => {
+		console.log("Can't find todo");
+		res.status(400).send("Can't find todo");
+	})
+});
+
+
 //SERVER
 app.listen(port, () => {
 	console.log(`Server running on poty: ${port}`);
-})
+});
 
 module.exports = {app};
