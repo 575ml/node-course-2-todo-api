@@ -1,15 +1,15 @@
 //config server
 require('./config/config');
 
-const	_ 		   = require('lodash'),
-		express    = require('express'),
-		bodyParser = require('body-parser'),
-		{ObjectID} = require('mongodb'),
-		{mongoose} = require('./db/mongoose'),
-		{Todo}     = require('./models/todo'),
-		{User}     = require('./models/user'),
-		app 	   = express();
-
+const	_ 		       = require('lodash'),
+		express        = require('express'),
+		bodyParser     = require('body-parser'),
+		{ObjectID}     = require('mongodb'),
+		{mongoose}     = require('./db/mongoose'),
+		{Todo}         = require('./models/todo'),
+		{User}         = require('./models/user'),
+		{authenticate} = require('./middleware/authenticate.js'),
+		app 	       = express();
 
 const port = process.env.PORT;
 
@@ -130,6 +130,11 @@ app.post('/users', (req, res) => {
   })
 });
 
+
+//GET /users/me
+app.get('/users/me', authenticate, (req, res) => {
+	res.send(req.user);
+});
 
 //SERVER
 app.listen(port, () => {
