@@ -4,16 +4,19 @@ require('./config/config');
 const	_ 		   = require('lodash'),
 		express    = require('express'),
 		bodyParser = require('body-parser'),
+		{ObjectID} = require('mongodb'),
 		{mongoose} = require('./db/mongoose'),
 		{Todo}     = require('./models/todo'),
 		{User}     = require('./models/user'),
-		app 	   = express(),
-		{ObjectID} = require('mongodb');
+		app 	   = express();
 
 
 const port = process.env.PORT;
 
 app.use(bodyParser.json());
+
+
+//*************** TODOS *************** //
 
 //POST todos
 app.post('/todos', (req, res) => {
@@ -84,7 +87,7 @@ app.delete('/todos/:id', (req, res) => {
 	});
 });
 
-
+//PATCH /todos/:id
 app.patch('/todos/:id', (req, res) => {
 	  var id = req.params.id;
 	  var body = _.pick(req.body, ['text', 'completed']);
@@ -110,6 +113,23 @@ app.patch('/todos/:id', (req, res) => {
 	    res.status(400).send();
 	  })
 });
+
+//*************** USERS *************** //
+
+//POST /users
+app.post('/users', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+  var user = new User(body);
+
+  user.save().then(() => {
+    return user.generateAuthToken();
+  }).then((token) => {
+    res.header('x-auth', token).send(user);
+  }).catch((e) => {
+    res.status(400).send(e);
+  })
+});
+
 
 //SERVER
 app.listen(port, () => {
