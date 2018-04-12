@@ -4,6 +4,7 @@ const mongoose  = require('mongoose'),
 	  _ 		= require('lodash'),
 	  bcrypt    = require('bcryptjs');
 
+//NEW USER
 var UserSchema = new mongoose.Schema({
 	email: {
 		type: String,
@@ -33,7 +34,7 @@ var UserSchema = new mongoose.Schema({
 	}]
 });
 
-
+//toJSON
 UserSchema.methods.toJSON = function () {
 	var user = this;
 	var userObject = user.toObject();
@@ -41,6 +42,7 @@ UserSchema.methods.toJSON = function () {
 	return _.pick(userObject, ['_id', 'email']);
 };
 
+//GENERATE TOKEN
 UserSchema.methods.generateAuthToken = function () {
 	var user = this;
 	var access = 'auth';
@@ -53,6 +55,7 @@ UserSchema.methods.generateAuthToken = function () {
 	});
 };
 
+//FIND BY TOKEN
 UserSchema.statics.findByToken = function(token) {
 	var User = this;
 	var decoded;
@@ -70,6 +73,18 @@ UserSchema.statics.findByToken = function(token) {
 	});
 };
 
+//REMOVE TOKEN
+UserSchema.methods.removeToken = function (token) {
+	var user = this;
+
+	return user.update({
+		$pull: {
+			tokens: {token}
+		}
+	});
+};
+
+//FIND BY CREDENTIALS
 UserSchema.statics.findByCredentials = function (email, password) {
   var User = this;
 
@@ -91,6 +106,7 @@ UserSchema.statics.findByCredentials = function (email, password) {
   });
 };
 
+//SAVE USER
 UserSchema.pre('save', function (next) {
 	var user = this;
 
