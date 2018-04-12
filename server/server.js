@@ -150,7 +150,7 @@ app.get('/users/me', authenticate, (req, res) => {
 });
 
 
-//DELETE /users/me/token
+//DELETE /users/me/token (loging out)
 app.delete('/users/me/token', authenticate, (req, res) => {
 	req.user.removeToken(req.token).then(() => {
 		res.status(200).send();
